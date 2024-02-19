@@ -1,0 +1,423 @@
+'HEX CLOCK
+'DIVIDES THE DAY INTO 65536 SECONDS AND DISPLAYS THEM AS FOUR DIGITS
+
+*&H100
+
+;@13
+'MOVE ;SCREEN_END 14
+
+>RESTART
+STOREM 3 <TIME
+
+STOREIM ! ;LIB_END REFR
+
+'GET SYNC POINT
+TIME 0 = =
+
+>TIMESYNC
+TIME 1 = =
+JER 0 1 <TIMESYNC
+MIL 0 1
+
+'CREATE SYNC OFFSET NUMBER
+
+I 0
+I 0
+S _01
+
+;I@STORE+ <SYNCPOINT
+
+STOREIM 0 ;LIB_END REFR
+
+
+>CLOCK
+
+'CALCULATE MILLISECONDS SINCE DAY STARTED
+I 0 'EXPAND
+I 0
+TIME 0 1 2 'R012 = H M S
+MIL .11 = 'GET MIL
+
+;I@LOAD+ <SYNCPOINT 'GET SYNC VALUE
+;I@SUB 'SUBTRACT SYNC VALUE; TIME SINCE PROGRAM STARTED
+;I@DROP
+
+;I@DUP 'CREATE DUPLICATE FOR SUB TO GET MOD
+' % 1000, MILLISEC OF CURRENT TIME
+';I@LIT+ 1000
+
+';I@MOD+
+
+'MAGIC DIVIDE BY 1000
+;I@LIT# &H20C4 &H9BA5 &HE353 &HF7CF
+;I@MUL
+;I@LIT+ 7
+;I@RSP+
+;I@SWAP
+;I@DROP
+
+;I@LIT+ 1000
+;I@MUL
+;I@DROP
+
+;I@SUB
+;I@DROP
+
+'CREATE TOTAL NUMBER OF SECONDS TODAY
+FUNC _0 ;I@EXPAND+ 'HOURS
+;I@LIT+ 3600 'SECONDS IN AN HOUR
+;I@MUL
+;I@DROP
+
+FUNC _1 ;I@EXPAND+ 'MINUTES
+;I@LIT+ 60 'SECONDS IN A MINUTE
+;I@MUL
+;I@DROP
+
+;I@ADD
+;I@DROP 'ADD TOGETHER
+
+FUNC _2 ;I@EXPAND+ 'SECONDS
+;I@ADD
+;I@DROP 'ADD TOGETHER
+
+;I@LIT+ 1000
+;I@MUL 'MILLISECONDS IN DAY
+;I@DROP
+
+;I@ADD
+;I@DROP 'ADD ACTUAL MILLISECONDS
+
+XORI ! ;LIB_END = REFR 'DRAW/ERASE BUSY BLOCK
+';I@LIT+ 1318 'DIVIDE DOWN TO TERNUTES
+';I@DIV+
+
+'INTEGER DIVISION BY MUTIPLY MAGIC
+;I@LIT# &H18DC &HA643 &H97E4 &H07C5
+;I@MUL
+;I@LIT+ 7
+;I@RSP+
+;I@SWAP
+;I@DROP
+
+;I@REDUCE
+
+G 3 'GET CURRENT HEX TIME
+
+JGR+ <TIME 3 <RESTART 'TIME MUST STRICTLY INCREASE
+JER <TIME 3 <CLOCK 'TIME NOT CHANGED?
+STOREM 3 <TIME
+
+'EXTRACT DIGITS OF TIME
+DIVI 256 3 .11 = 'SPLIT INTO BYTES
+
+DIVI 16 .11 = = 'SPLIT INTO DIGITS
+
+JER <DIGIT1 .11 <D1SKIP
+<DRAWD1
+
+>D1SKIP
+JER <DIGIT2 .11 <D2SKIP
+<DRAWD2
+
+>D2SKIP
+DIVI 16 .11 = = 'SPLIT INTO DIGITS
+JER <DIGIT3 .11 <D3SKIP
+<DRAWD3
+
+>D3SKIP
+JER <DIGIT4 .11 <D4SKIP
+<DRAWD4
+
+>D4SKIP
+
+REFR
+
+JUMP <CLOCK
+
+>SWAP_DRAW
+MOVE 1 0
+SWAP .11 =
+;@DRAW
+]
+
+>DRAWD1
+DEC 11 'RECOVER H10
+STOREM ,11 <DIGIT1 'STORE AWAY NEW VALUE
+ADDI <INDEX ,11 = % 'ADD INDEX
+LOADR .11 = 'DEREFERENCE POINTER
+I 33
+JUMP <SWAP_DRAW
+
+>DRAWD2
+DEC 11 'RECOVER H10
+STOREM ,11 <DIGIT2 'STORE AWAY NEW VALUE
+ADDI <INDEX ,11 = % 'ADD INDEX
+LOADR .11 = 'DEREFERENCE POINTER
+I 41
+JUMP <SWAP_DRAW
+
+>DRAWD3
+DEC 11 'RECOVER H10
+STOREM ,11 <DIGIT3 'STORE AWAY NEW VALUE
+ADDI <INDEX ,11 = % 'ADD INDEX
+LOADR .11 = 'DEREFERENCE POINTER
+I 49
+JUMP <SWAP_DRAW
+
+>DRAWD4
+DEC 11 'RECOVER H10
+STOREM ,11 <DIGIT4 'STORE AWAY NEW VALUE
+ADDI <INDEX ,11 = % 'ADD INDEX
+LOADR .11 = 'DEREFERENCE POINTER
+I 57
+JUMP <SWAP_DRAW
+
+
+
+
+'DATA
+>SYNCPOINT 0 0 0 0 'SYNC OFFSET
+
+'HEX TIME
+>TIME 0
+
+>DIGIT1 -1
+>DIGIT2 -1
+>DIGIT3 -1
+>DIGIT4 -1
+
+
+'SPRITE INDEX
+>INDEX
+<D0
+<D1
+<D2
+<D3
+<D4
+<D5
+<D6
+<D7
+<D8
+<D9
+<DA
+<DB
+<DC
+<DD
+<DE
+<DF
+<D0
+
+'DIGITS
+>D0
+6 10
+$  
+$    
+$    
+$    
+$    
+$    
+$    
+$    
+$    
+$  
+
+>D1
+6 10
+$    
+$     
+$     
+$     
+$     
+$     
+$     
+$     
+$     
+$     
+
+>D2
+6 10
+$  
+$    
+$     
+$     
+$  
+$     
+$     
+$     
+$     
+$
+
+>D3
+6 10
+$  
+$    
+$     
+$     
+$   
+$     
+$     
+$     
+$    
+$  
+
+>D4
+6 10
+$     
+$    
+$    
+$    
+$    
+$    
+$
+$     
+$     
+$     
+
+>D5
+6 10
+$
+$     
+$     
+$     
+$ 
+$     
+$     
+$     
+$    
+$  
+
+>D6
+6 10
+$  
+$     
+$     
+$     
+$ 
+$    
+$    
+$    
+$    
+$  
+
+>D7
+6 10
+$
+$     
+$     
+$     
+$     
+$     
+$     
+$     
+$     
+$     
+
+>D8
+6 10
+$  
+$    
+$    
+$    
+$  
+$    
+$    
+$    
+$    
+$  
+
+>D9
+6 10
+$  
+$    
+$    
+$    
+$    
+$ 
+$     
+$     
+$     
+$  
+
+>DA
+6 10
+$  
+$    
+$    
+$    
+$    
+$
+$    
+$    
+$    
+$    
+
+>DB
+6 10
+$ 
+$    
+$    
+$    
+$ 
+$    
+$    
+$    
+$    
+$ 
+
+>DC
+6 10
+$  
+$    
+$     
+$     
+$     
+$     
+$     
+$     
+$    
+$  
+
+>DD
+6 10
+$ 
+$    
+$    
+$    
+$    
+$    
+$    
+$    
+$    
+$ 
+
+>DE
+6 10
+$
+$     
+$     
+$     
+$
+$     
+$     
+$     
+$     
+$
+
+>DF
+6 10
+$
+$     
+$     
+$     
+$
+$     
+$     
+$     
+$     
+$     
+
+>SCREEN
+0
+>SCREEN2
+

@@ -1,0 +1,287 @@
+*&H100
+'NEOCLOCK
+MOVE <END 14
+;@13
+
+MOVE 60 1
+
+>LOOP
+TIME % % 2
+JER 1 2 <LOOP
+
+REFR
+
+MOVE 0 0
+TIME .12 = = 'GET TIME
+COPY ,12 1
+DIVI 10 .12 .11 =
+DIVI 10 .12 .11 =
+DIVI 10 .12 .11 =
+
+'TOP OF STACK IS HOUR TENS DIGIT
+JER <THOUR10 .11 <H10SKIP
+<DRAWH10
+
+>H10SKIP
+JER <THOUR1 .11 <H1SKIP
+<DRAWH1
+
+>H1SKIP
+JER <TMINUTE10 .11 <M10SKIP
+<DRAWM10
+
+>M10SKIP
+JER <TMINUTE1 .11 <M1SKIP
+<DRAWM1
+
+>M1SKIP
+JER <TSECOND10 .11 <S10SKIP
+<DRAWS10
+
+>S10SKIP
+JER <TSECOND1 .11 <S1SKIP
+<DRAWS1
+
+>S1SKIP
+
+JUMP <LOOP
+
+'SPRITE INDEX
+>INDEX
+<D0
+<D1
+<D2
+<D3
+<D4
+<D5
+<D6
+<D7
+<D8
+<D9
+
+
+'DIGITS
+>D0
+8 12
+$        
+$    
+$      
+$      
+$      
+$      
+$      
+$      
+$      
+$      
+$    
+$        
+
+>D1
+8 12
+$        
+$      
+$       
+$       
+$       
+$       
+$       
+$       
+$       
+$       
+$       
+$        
+
+>D2
+8 12
+$        
+$    
+$      
+$       
+$       
+$    
+$       
+$       
+$       
+$       
+$  
+$        
+
+>D3
+8 12
+$        
+$    
+$      
+$       
+$       
+$     
+$       
+$       
+$       
+$      
+$    
+$        
+
+>D4
+8 12
+$        
+$       
+$      
+$      
+$      
+$      
+$      
+$  
+$       
+$       
+$       
+$        
+
+>D5
+8 12
+$        
+$  
+$       
+$       
+$       
+$   
+$       
+$       
+$       
+$      
+$    
+$        
+
+>D6
+8 12
+$        
+$    
+$       
+$       
+$       
+$   
+$      
+$      
+$      
+$      
+$    
+$        
+
+>D7
+8 12
+$        
+$  
+$       
+$       
+$       
+$       
+$       
+$       
+$       
+$       
+$       
+$        
+
+>D8
+8 12
+$        
+$    
+$      
+$      
+$      
+$    
+$      
+$      
+$      
+$      
+$    
+$        
+
+>D9
+8 12
+$        
+$    
+$      
+$      
+$      
+$      
+$   
+$       
+$       
+$       
+$    
+$        
+
+>THOUR10
+10
+
+>THOUR1
+10
+
+>TMINUTE10
+10
+
+>TMINUTE1
+10
+
+>TSECOND10
+10
+
+>TSECOND1
+10
+
+>DRAWH10
+DEC 11 'RECOVER H10
+STOREM ,11 <THOUR10 'STORE AWAY NEW VALUE
+ADDI <INDEX ,11 = % 'ADD INDEX
+LOADR .11 = 'DEREFERENCE POINTER
+I 0
+JUMP <SWAP_DRAW
+
+>DRAWH1
+DEC 11 'RECOVER H1
+STOREM ,11 <THOUR1 'STORE AWAY NEW VALUE
+ADDI <INDEX ,11 = % 'ADD INDEX
+LOADR .11 = 'DEREFERENCE POINTER
+I 8
+JUMP <SWAP_DRAW
+
+>DRAWM10
+DEC 11 'RECOVER M10
+STOREM ,11 <TMINUTE10 'STORE AWAY NEW VALUE
+ADDI <INDEX ,11 = % 'ADD INDEX
+LOADR .11 = 'DEREFERENCE POINTER
+I 16
+JUMP <SWAP_DRAW
+
+>DRAWM1
+DEC 11 'RECOVER M1
+STOREM ,11 <TMINUTE1 'STORE AWAY NEW VALUE
+ADDI <INDEX ,11 = % 'ADD INDEX
+LOADR .11 = 'DEREFERENCE POINTER
+I 24
+JUMP <SWAP_DRAW
+
+>DRAWS10
+DEC 11 'RECOVER S10
+STOREM ,11 <TSECOND10 'STORE AWAY NEW VALUE
+ADDI <INDEX ,11 = % 'ADD INDEX
+LOADR .11 = 'DEREFERENCE POINTER
+I 384
+JUMP <SWAP_DRAW
+
+>DRAWS1
+DEC 11 'RECOVER S10
+STOREM ,11 <TSECOND1 'STORE AWAY NEW VALUE
+ADDI <INDEX ,11 = % 'ADD INDEX
+LOADR .11 = 'DEREFERENCE POINTER
+I 392
+JUMP <SWAP_DRAW
+
+
+>SWAP_DRAW
+SWAP .11 =
+;@DRAW
+]
+
+>END
+
